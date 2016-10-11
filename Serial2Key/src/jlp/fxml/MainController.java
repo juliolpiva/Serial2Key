@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -97,6 +98,8 @@ public class MainController implements Initializable {
 				
 				if(ini > 0){
 					ini = boxIni;
+				}else{
+					ini = 0;
 				}
 				
 				if(end <= ini){
@@ -107,8 +110,10 @@ public class MainController implements Initializable {
 		
 				serialControl.writeByte((byte)0x05);	// Inicializa transmissão (ENQ)		
 				
-				/*int delay = 1000;   // delay de 5 seg.
+				int delay = 1000;   // delay de 5 seg.
 			    int interval = 1000;  // intervalo de 1 seg.
+			   
+			    timer = new Timer();
 			    
 	    	    timer.scheduleAtFixedRate(new TimerTask() {
 		            public void run() {
@@ -116,10 +121,8 @@ public class MainController implements Initializable {
 		        		//receiveMsg("2 PPPPP 3");
 		        		serialControl.writeCOM("QTT\n\r");
 		            }
-		        }, delay, interval);*/	
-			    
-			    
-			    
+		        }, delay, interval);
+			    			    
 			} else {
 				dialogCreator.alertError("Error", "Nao foi possivel Conectar", "Nao foi possivel conectar na porta selecionada");
 				btnStart.setSelected(false);
@@ -128,7 +131,9 @@ public class MainController implements Initializable {
 		}else{
 			serialControl.disconectCOM();
 			System.out.println("End");
+			
 			timer.cancel();
+			
 		}
 
 	}
