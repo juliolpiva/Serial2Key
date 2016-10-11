@@ -110,7 +110,7 @@ public class MainController implements Initializable {
 		
 				serialControl.writeByte((byte)0x05);	// Inicializa transmissão (ENQ)		
 				
-				int delay = 1000;   // delay de 5 seg.
+				/*int delay = 1000;   // delay de 5 seg.
 			    int interval = 1000;  // intervalo de 1 seg.
 			   
 			    timer = new Timer();
@@ -121,7 +121,7 @@ public class MainController implements Initializable {
 		        		//receiveMsg("2 PPPPP 3");
 		        		serialControl.writeCOM("QTT\n\r");
 		            }
-		        }, delay, interval);
+		        }, delay, interval);*/
 			    			    
 			} else {
 				dialogCreator.alertError("Error", "Nao foi possivel Conectar", "Nao foi possivel conectar na porta selecionada");
@@ -132,7 +132,7 @@ public class MainController implements Initializable {
 			serialControl.disconectCOM();
 			System.out.println("End");
 			
-			timer.cancel();
+			//timer.cancel();
 			
 		}
 
