@@ -20,6 +20,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
@@ -54,6 +55,8 @@ public class MainController implements Initializable {
 	private TabPane tabPane;
 	@FXML
 	private ToggleButton btnStart;
+	@FXML
+	private CheckBox boxKey, boxFilt, boxTerm;
 	
 	public static Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Brazil/East"));
 	
@@ -99,7 +102,7 @@ public class MainController implements Initializable {
 				if(end <= ini){
 					end = boxIni;
 				}else{
-					end = boxEnd;
+					end = boxEnd;					
 				}
 		
 				serialControl.writeByte((byte)0x05);	// Inicializa transmissão (ENQ)		
@@ -109,11 +112,11 @@ public class MainController implements Initializable {
 			    
 	    	    timer.scheduleAtFixedRate(new TimerTask() {
 		            public void run() {
-		            	System.out.println(ini+" e "+end);
+		            	//System.out.println(ini+" e "+end);
 		        		//receiveMsg("2 PPPPP 3");
 		        		serialControl.writeCOM("QTT\n\r");
 		            }
-		        }, delay, interval);	*/
+		        }, delay, interval);*/	
 			    
 			    
 			    
@@ -139,10 +142,16 @@ public class MainController implements Initializable {
 		
 		receivedMsg = (msg.substring(ini, end));
 		
-		viewTela.appendText(receivedMsg+"\n");
-		viewTela2.appendText(msg+"\n");
+		if(boxFilt.isSelected()){
+			viewTela.appendText(receivedMsg+"\n");
+		}
 		
-		try {
+		if(boxTerm.isSelected()){
+			viewTela2.appendText(msg+"\n");
+		}
+		
+		if(boxKey.isSelected()){
+					try {
 	        Robot robot = new Robot();
 
 	        char[] filtredMsg = receivedMsg.toCharArray();
@@ -156,11 +165,13 @@ public class MainController implements Initializable {
 	        robot.keyRelease(KeyEvent.VK_ENTER);
 	        
 	      
-	} catch (AWTException e) {
-	        e.printStackTrace();
+		} catch (AWTException e) {
+		        e.printStackTrace();
+		}
+			
+		}
 	}
-		
-	}
+
 
 	public void actionSerialSave(ActionEvent evt) {
 		File arquivo = new File("config.txt");
@@ -297,7 +308,7 @@ public class MainController implements Initializable {
 	
 	public void actionSobre(ActionEvent evt) {
 		dialogCreator.alertInformation("Sobre", "Serial2Key",
-				"Desenvolvido por Julio Locatelli Piva\nVersao 1.1");
+				"Desenvolvido por Julio Locatelli Piva\nVersao 1.2");
 	}
 
 }

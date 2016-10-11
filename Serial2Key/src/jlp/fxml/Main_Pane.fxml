@@ -34,7 +34,10 @@
                            </font>
                         </Label>
                         <TextField fx:id="stringEnd" layoutX="88.0" layoutY="84.0" prefHeight="25.0" prefWidth="40.0" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="90.0" />
-                        <ToggleButton fx:id="btnStart" layoutX="48.0" layoutY="206.0" mnemonicParsing="false" onAction="#actionStart" prefHeight="34.0" prefWidth="55.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="75.0" />
+                        <ToggleButton fx:id="btnStart" layoutX="48.0" layoutY="206.0" mnemonicParsing="false" onAction="#actionStart" prefHeight="34.0" prefWidth="55.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="125.0" />
+                        <CheckBox fx:id="boxKey" layoutX="19.0" layoutY="127.0" mnemonicParsing="false" selected="true" text="Keyboard" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="20.0" />
+                        <CheckBox fx:id="boxFilt" layoutX="19.0" layoutY="148.0" mnemonicParsing="false" text="Filtrado" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" />
+                        <CheckBox fx:id="boxTerm" layoutX="19.0" layoutY="171.0" mnemonicParsing="false" text="Terminal" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="20.0" />
                      </children>
                   </AnchorPane>
                </content>
