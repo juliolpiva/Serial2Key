@@ -9,13 +9,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,6 +75,9 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		configAtual = ConfigCOM.loadDefault();
+
+		//configAtual = ConfigCOM.loadFromTxt();
+		System.out.println(configAtual);
 		lblConfig.setText("Config: " + configAtual);
 		stringIni.setText("2");
 		stringEnd.setText("7");
@@ -86,17 +89,17 @@ public class MainController implements Initializable {
 			System.out.println("Start");
 
 			boolean conec;
-			conec = serialControl.connectCOM(configAtual);
+			conec = serialControl.connectCOM(configAtual);			// Conecta com a Serial utilizando as configurações atuais
 			
 			if (conec) {
 				int boxIni=0, boxEnd=0;
 				try{
-					boxIni = Integer.parseInt(stringIni.getText());
+					boxIni = Integer.parseInt(stringIni.getText());	// Recebe valores setados de Ini e End
 					boxEnd = Integer.parseInt(stringEnd.getText());
 				}catch (NullPointerException e){	
 				}
 				
-				if(ini > 0){
+				if(ini > 0){						// Realiza testes para verificar validade de Ini e End
 					ini = boxIni;
 				}else{
 					ini = 0;
@@ -108,9 +111,9 @@ public class MainController implements Initializable {
 					end = boxEnd;					
 				}
 		
-				serialControl.writeByte((byte)0x05);	// Inicializa transmissÃ£o (ENQ)		
+				serialControl.writeByte((byte)'\u0005');	// Inicializa Transmissao \u0005 = ENQ = ENQUIRY		
 				
-				/*int delay = 1000;   // delay de 5 seg.
+				/*int delay = 1000;   // delay de 5 seg.		// Timer utilizado para testes
 			    int interval = 1000;  // intervalo de 1 seg.
 			   
 			    timer = new Timer();
@@ -129,7 +132,7 @@ public class MainController implements Initializable {
 			}
 			
 		}else{
-			serialControl.disconectCOM();
+			serialControl.disconectCOM();		// Desconecta da COM
 			System.out.println("End");
 			
 			//timer.cancel();
@@ -140,6 +143,8 @@ public class MainController implements Initializable {
 
 
 	public void receiveMsg(String msg) {
+		/* Neste método se recebe a mensagem da porta serial e é realizado o tratamento da mesma, verificando
+			se é mostrada na aba Terminal, aba Filtro e se reproduz na keyboard */
 		
 		if (msg.length()<=end){
 			end=msg.length()-1;
@@ -156,7 +161,9 @@ public class MainController implements Initializable {
 		}
 		
 		if(boxKey.isSelected()){
-					try {
+			//Clase robot realiza a simulação do keyboard
+			
+			try {
 	        Robot robot = new Robot();
 
 	        char[] filtredMsg = receivedMsg.toCharArray();
@@ -166,7 +173,7 @@ public class MainController implements Initializable {
 		        robot.keyRelease(filtredMsg[i]);
 	        }
 	        
-        	robot.keyPress(KeyEvent.VK_ENTER);
+        	robot.keyPress(KeyEvent.VK_ENTER);		// Adicionado um Enter após a mensagem recebida
 	        robot.keyRelease(KeyEvent.VK_ENTER);
 	        
 	      
@@ -179,6 +186,8 @@ public class MainController implements Initializable {
 
 
 	public void actionSerialSave(ActionEvent evt) {
+		// Método para salvar as configurações da porta COM em um arquivo txt
+		
 		File arquivo = new File("config.txt");
 
 		try {
@@ -209,7 +218,8 @@ public class MainController implements Initializable {
 	}
 	
 	public void actionSerialEdit(ActionEvent evt) {
-
+		// Método para editar as configurações da porta COM
+		
 		Dialog<ConfigCOM> cfgDialog = new Dialog<>();
 		DialogPane dialogPane = new DialogPane();
 		dialogPane.setContent((AnchorPane) dialogCtrl);
@@ -234,24 +244,73 @@ public class MainController implements Initializable {
 		stage.getIcons().add(dialogCreator.terminalIcon);
 		cfgDialog.showAndWait();
 		lblConfig.setText("Config: " + configAtual);
+		//System.out.println(configAtual);
 		
+		
+		/*// ------- Salva configuração atual txt ----
+				  	
+		File arquivo = new File("src/jlp/lastpredef.txt");
+		try {
+			boolean exist = arquivo.exists();
+			if (exist) {
+				arquivo.delete();
+				arquivo.createNewFile();
+			} else
+				arquivo.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			FileWriter arq = new FileWriter("src/jlp/lastpredef.txt");
+			String texto = ("COM+" + configAtual.portName + System.getProperty("line.separator") + "Baud+"
+					+ configAtual.baudrate + System.getProperty("line.separator") + "Data+" + configAtual.dataBits
+					+ System.getProperty("line.separator") + "Pari+" + configAtual.parityBit
+					+ System.getProperty("line.separator") + "Stop+" + configAtual.stopBits);
+			// System.out.println(texto);
+			arq.write(texto);
+			arq.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// --------------------------
+		*/
+		
+		/* Salva as configurações da porta com em um arquivo .porperties, e sempre ao inicializar o programa
+		 carrega as configurações da ultima sessão.*/
         Properties configProperties = new Properties();
         configProperties.setProperty("portName", configAtual.portName);
         configProperties.setProperty("baudrate", Integer.toString(configAtual.baudrate));
         configProperties.setProperty("dataBits", Integer.toString(configAtual.dataBits));
         configProperties.setProperty("parity", Integer.toString(configAtual.parityBit));
         configProperties.setProperty("stopBits", Integer.toString(configAtual.stopBits));
-        
+
         try {
-			configProperties.store(new FileOutputStream("resources/config/serial_port.properties"), null);
+        	FileOutputStream file = new FileOutputStream("conf/serial_port.properties");
+        	configProperties.store(file, null);
+        	file.close();
+			//configProperties.store(new FileOutputStream("resources/config/serial_port.properties"), null);
+	
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
+        
+        try {
+            InputStream cfgStream = new FileInputStream ("conf/serial_port.properties");
+			configProperties.load(cfgStream);  
+			System.out.println(configProperties);
+			cfgStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}    
 	}
 
 	public void actionSerialLoad(ActionEvent evt) {
+		// Carrega as configurações da porta com a partir de um arquivo .txt
+		
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Selecione o arquivo de programacao!");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"),
@@ -270,6 +329,8 @@ public class MainController implements Initializable {
 	}
 	
 	public void actionClearScreen(ActionEvent evt) {
+		// Limpa a tela da aba selecionada
+		
 		if(tabFiltro.isSelected()){
 			viewTela.clear();
 		}else{
@@ -278,6 +339,7 @@ public class MainController implements Initializable {
 	}
 	
 	public void actionSaveScreen(ActionEvent evt) {
+		// Salva a tela da aba selecionada em um arquivo .txt
 		File arquivo = new File("TerminalScreen.txt");
 
 		try {

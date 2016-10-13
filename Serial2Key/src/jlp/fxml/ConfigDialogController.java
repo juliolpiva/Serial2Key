@@ -43,9 +43,8 @@ public class ConfigDialogController extends AnchorPane implements Initializable 
 		try {
 			// Files.lines(Paths.get("src/application/config.txt")).forEach(line->
 			// System.out.println(line));
-			String linha;
-
-			
+			String linha;	
+			//System.out.println(ClassLoader.getSystemResourceAsStream("config/config.txt"));
 			BufferedReader file_buffer = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("config/config.txt")));
 
 			while ((linha = file_buffer.readLine()) != null) {

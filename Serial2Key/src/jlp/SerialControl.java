@@ -64,7 +64,7 @@ public class SerialControl {
 									char y = buffer.charAt(x);
 									buffer2 = buffer2 + y;
 									buffer3 = buffer2;
-									if (y == '\n') {
+									if ((y == '\u0003')||(y == '\n')) {		// \u0003 = END OF TEXT
 										buffer3 = buffer2;
 										buffer2 = buffer.substring(x);
 										mainController.receiveMsg(buffer3);

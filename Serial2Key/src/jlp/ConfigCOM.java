@@ -1,11 +1,15 @@
 package jlp;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
+
 public class ConfigCOM {
-    private static final String SERIAL_PORT_PROPERTIES = "/config/serial_port.properties";
+    private static final String SERIAL_PORT_PROPERTIES = "conf/serial_port.properties";
    
     public final String portName;
     public final int baudrate;
@@ -29,15 +33,17 @@ public class ConfigCOM {
         Properties configProperties = new Properties();
         try
         {
-            InputStream cfgStream = ConfigCOM.class.getResourceAsStream(SERIAL_PORT_PROPERTIES);
+            InputStream cfgStream = new FileInputStream( SERIAL_PORT_PROPERTIES );
             configProperties.load(cfgStream);
-           // System.out.println(configProperties);
+            System.out.println(configProperties); 
+            cfgStream.close();
         } catch (IOException e) 
         {
            System.err.println("Nao foi possivel carregar as configuracoes "
                    + "padrao a partir do arquivo " + SERIAL_PORT_PROPERTIES);
            System.err.println(e.getMessage());
         }
+       
         return loadFromProperties(configProperties);
     }    
 
@@ -47,6 +53,45 @@ public class ConfigCOM {
         currentSerialCfg.load(configStream);
 
         return loadFromProperties(currentSerialCfg);
+    }
+    
+    public static ConfigCOM loadFromTxt() 
+    {
+		String txtcom = null, txtbaud= null, data = null, pari= null, stop = null;
+		int x = 0;
+
+    	try {
+
+    		//File file = new File("src/jlp/lastpredef.txt");
+
+			String linha;
+		//	BufferedReader fileBuffer = new BufferedReader(new FileReader(file.getAbsolutePath()));
+			
+			BufferedReader fileBuffer = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("config/lastpredef.txt")));
+
+			while ((linha = fileBuffer.readLine()) != null) {
+				x++;
+				switch (x) {
+				case 1:
+					txtcom = linha.substring(linha.indexOf("+")+1);
+				case 2:
+					txtbaud = linha.substring(linha.indexOf('+')+1);
+				case 3:
+					data = linha.substring(linha.indexOf('+')+1);
+				case 4:
+					pari = linha.substring(linha.indexOf('+')+1);
+				case 5:
+					stop = linha.substring(linha.indexOf('+')+1);
+				}
+			}
+
+			fileBuffer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	ConfigCOM config = new ConfigCOM (txtcom,Integer.parseInt(txtbaud),Integer.parseInt(data),Integer.parseInt(pari),Integer.parseInt(stop));
+        return config;
     }
 
     public static ConfigCOM loadFromProperties(Properties config)
