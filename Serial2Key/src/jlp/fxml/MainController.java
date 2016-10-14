@@ -361,7 +361,7 @@ public class MainController implements Initializable {
 	
 	public void actionSobre(ActionEvent evt) {
 		dialogCreator.alertInformation("Sobre", "Serial2Key",
-				"Desenvolvido por Julio Locatelli Piva\nVersao 1.2");
+				"Desenvolvido por Julio Locatelli Piva\nVersao 2.0");
 	}
 
 }
