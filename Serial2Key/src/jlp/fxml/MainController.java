@@ -83,20 +83,21 @@ public class MainController implements Initializable {
 		lblConfig.setText("Config: " + configAtual);
 		
 		Main.stagePrimario.setOnCloseRequest(event -> {
-			// Salva as configurações de index em um arquivo .porperties
-	        Properties configProperties = new Properties();
-	        configProperties.setProperty("indexIni", stringIni.getText());
-	        configProperties.setProperty("indexEnd", stringEnd.getText());
-	        try {
-	        	FileOutputStream file = new FileOutputStream(CONFIG_PROPERTIES);
-	        	configProperties.store(file, null);
-	        	file.close();
-		
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}		
+			// Salva as configurações de index em um arquivo .porperties	
+            try {
+    	        Properties configProperties = new Properties(); 
+				InputStream in = new FileInputStream(CONFIG_PROPERTIES);
+				configProperties.load(in);  
+				in.close();
+			    configProperties.setProperty("indexIni", stringIni.getText());
+			    configProperties.setProperty("indexEnd", stringEnd.getText());
+				FileOutputStream out = new FileOutputStream(CONFIG_PROPERTIES);
+	        	configProperties.store(out, null);
+	        	out.close();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}	
+            
 		    System.exit(0);
 		});
 	}
@@ -272,18 +273,20 @@ public class MainController implements Initializable {
 		
 		/* Salva as configurações da porta com em um arquivo .porperties, e sempre ao inicializar o programa
 		 carrega as configurações da ultima sessão.*/
-        Properties configProperties = new Properties();
-        configProperties.setProperty("portName", configAtual.portName);
-        configProperties.setProperty("baudrate", Integer.toString(configAtual.baudrate));
-        configProperties.setProperty("dataBits", Integer.toString(configAtual.dataBits));
-        configProperties.setProperty("parity", Integer.toString(configAtual.parityBit));
-        configProperties.setProperty("stopBits", Integer.toString(configAtual.stopBits));
-
+		
         try {
-        	FileOutputStream file = new FileOutputStream(CONFIG_PROPERTIES);
-        	configProperties.store(file, null);
-        	file.close();
-	
+	        Properties configProperties = new Properties(); 
+			InputStream in = new FileInputStream(CONFIG_PROPERTIES);
+			configProperties.load(in);  
+			in.close();
+	        configProperties.setProperty("portName", configAtual.portName);
+	        configProperties.setProperty("baudrate", Integer.toString(configAtual.baudrate));
+	        configProperties.setProperty("dataBits", Integer.toString(configAtual.dataBits));
+	        configProperties.setProperty("parity", Integer.toString(configAtual.parityBit));
+	        configProperties.setProperty("stopBits", Integer.toString(configAtual.stopBits));
+			FileOutputStream out = new FileOutputStream(CONFIG_PROPERTIES);
+	    	configProperties.store(out, null);
+	    	out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
