@@ -59,6 +59,8 @@ public class MainController implements Initializable {
 	@FXML
 	private CheckBox boxKey, boxFilt, boxTerm;
 	
+	
+	private static final String CONFIG_PROPERTIES = "conf/config.properties";
 	public static Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Brazil/East"));
 	
 	private DialogCreator dialogCreator = new DialogCreator();
@@ -69,18 +71,51 @@ public class MainController implements Initializable {
 
 	private String receivedMsg;
 	private int  ini=2, end=7;
+	
+	@SuppressWarnings("unused")
 	private Timer timer = new Timer();
 
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		configAtual = ConfigCOM.loadDefault();
-
-		//configAtual = ConfigCOM.loadFromTxt();
-		System.out.println(configAtual);
+		loadIndex();
 		lblConfig.setText("Config: " + configAtual);
-		stringIni.setText("2");
-		stringEnd.setText("7");
+		
+		Main.stagePrimario.setOnCloseRequest(event -> {
+			// Salva as configurações de index em um arquivo .porperties
+	        Properties configProperties = new Properties();
+	        configProperties.setProperty("indexIni", stringIni.getText());
+	        configProperties.setProperty("indexEnd", stringEnd.getText());
+	        try {
+	        	FileOutputStream file = new FileOutputStream(CONFIG_PROPERTIES);
+	        	configProperties.store(file, null);
+	        	file.close();
+		
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}		
+		    System.exit(0);
+		});
+	}
+	
+	public void loadIndex(){
+	      Properties configProperties = new Properties();
+	        try
+	        {
+	            InputStream cfgStream = new FileInputStream(CONFIG_PROPERTIES);
+	            configProperties.load(cfgStream);
+	            cfgStream.close();
+	        } catch (IOException e) 
+	        {
+	           System.err.println("Nao foi possivel carregar as configuracoes "
+	                   + "padrao a partir do arquivo " + CONFIG_PROPERTIES);
+	           System.err.println(e.getMessage());
+	        }	        
+			stringIni.setText(configProperties.getProperty("indexIni"));
+			stringEnd.setText(configProperties.getProperty("indexEnd"));
 	}
 	
 	public void actionStart(ActionEvent evt) {
@@ -184,18 +219,9 @@ public class MainController implements Initializable {
 		}
 	}
 
-
 	public void actionSerialSave(ActionEvent evt) {
 		// Método para salvar as configurações da porta COM em um arquivo txt
 		
-		File arquivo = new File("config.txt");
-
-		try {
-			arquivo.createNewFile();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Selecione o diretorio para Salvar!");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text File", "*.txt"),
@@ -208,7 +234,6 @@ public class MainController implements Initializable {
 			String texto = ("Baud+" + configAtual.baudrate + System.getProperty("line.separator") + "Data+"
 					+ configAtual.dataBits + System.getProperty("line.separator") + "Pari+" + configAtual.parityBit
 					+ System.getProperty("line.separator") + "Stop+" + configAtual.stopBits);
-			// System.out.println(texto);
 			arq.write(texto);
 			arq.close();
 
@@ -244,37 +269,6 @@ public class MainController implements Initializable {
 		stage.getIcons().add(dialogCreator.terminalIcon);
 		cfgDialog.showAndWait();
 		lblConfig.setText("Config: " + configAtual);
-		//System.out.println(configAtual);
-		
-		
-		/*// ------- Salva configuração atual txt ----
-				  	
-		File arquivo = new File("src/jlp/lastpredef.txt");
-		try {
-			boolean exist = arquivo.exists();
-			if (exist) {
-				arquivo.delete();
-				arquivo.createNewFile();
-			} else
-				arquivo.createNewFile();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			FileWriter arq = new FileWriter("src/jlp/lastpredef.txt");
-			String texto = ("COM+" + configAtual.portName + System.getProperty("line.separator") + "Baud+"
-					+ configAtual.baudrate + System.getProperty("line.separator") + "Data+" + configAtual.dataBits
-					+ System.getProperty("line.separator") + "Pari+" + configAtual.parityBit
-					+ System.getProperty("line.separator") + "Stop+" + configAtual.stopBits);
-			// System.out.println(texto);
-			arq.write(texto);
-			arq.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// --------------------------
-		*/
 		
 		/* Salva as configurações da porta com em um arquivo .porperties, e sempre ao inicializar o programa
 		 carrega as configurações da ultima sessão.*/
@@ -286,26 +280,15 @@ public class MainController implements Initializable {
         configProperties.setProperty("stopBits", Integer.toString(configAtual.stopBits));
 
         try {
-        	FileOutputStream file = new FileOutputStream("conf/serial_port.properties");
+        	FileOutputStream file = new FileOutputStream(CONFIG_PROPERTIES);
         	configProperties.store(file, null);
         	file.close();
-			//configProperties.store(new FileOutputStream("resources/config/serial_port.properties"), null);
 	
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-        
-        try {
-            InputStream cfgStream = new FileInputStream ("conf/serial_port.properties");
-			configProperties.load(cfgStream);  
-			System.out.println(configProperties);
-			cfgStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}    
 	}
 
 	public void actionSerialLoad(ActionEvent evt) {

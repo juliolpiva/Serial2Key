@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import jlp.ConfigCOM;
 import jlp.SerialControl;
 
 import javafx.fxml.FXML;
@@ -41,10 +42,7 @@ public class ConfigDialogController extends AnchorPane implements Initializable 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			// Files.lines(Paths.get("src/application/config.txt")).forEach(line->
-			// System.out.println(line));
 			String linha;	
-			//System.out.println(ClassLoader.getSystemResourceAsStream("config/config.txt"));
 			BufferedReader file_buffer = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("config/config.txt")));
 
 			while ((linha = file_buffer.readLine()) != null) {
@@ -64,15 +62,18 @@ public class ConfigDialogController extends AnchorPane implements Initializable 
 		}
 
 		boxCom.getItems().addAll(serialControl.getPorts());
-		boxCom.getSelectionModel().select(0);
 		boxBaudrate.getItems().addAll(listBaud);
-		boxBaudrate.setValue(listBaud.get(1));
 		boxDatabits.getItems().addAll(listData);
-		boxDatabits.setValue(listData.get(0));
 		boxParity.getItems().addAll(listPari);
-		boxParity.setValue(listPari.get(0));
 		boxStopbits.getItems().addAll(listStop);
-		boxStopbits.setValue(listStop.get(1));
+		
+		ConfigCOM config = ConfigCOM.loadDefault();
+		boxCom.setValue(config.portName);
+		boxBaudrate.setValue(Integer.toString(config.baudrate));
+		boxDatabits.setValue(Integer.toString(config.dataBits));
+		boxParity.setValue(config.parityBit == 1 ? "Sim" : "Não");
+		boxStopbits.setValue(Integer.toString(config.stopBits));
+		
 	}
 
 	public String getcom() {

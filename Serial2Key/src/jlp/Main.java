@@ -17,7 +17,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-
+			stagePrimario = primaryStage;
 			root = FXMLLoader.load(getClass().getResource("fxml/Main_Pane.fxml"));
 			mainScene = new Scene(root,400,300);
 			
@@ -29,12 +29,10 @@ public class Main extends Application {
 			primaryStage.show();
 			
 			
-			primaryStage.setOnCloseRequest(event -> {
-				System.out.println("Close all");
+			/*primaryStage.setOnCloseRequest(event -> {
 			    System.exit(0);
-			});
+			});*/
 			
-			stagePrimario = primaryStage;
 
 		} catch(Exception e) {
 			e.printStackTrace();
